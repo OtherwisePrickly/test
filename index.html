@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Innovation Culture Readiness | AWS AGS UKI</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ═══════════ RESET & VARIABLES ═══════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#FF9900;--orange-light:#FFB84D;--orange-dark:#E68A00;
+  --navy:#232F3E;--navy-deep:#161E2D;--navy-light:#2E3A4E;
+  --dark:#0D1117;--dark-card:#161B22;--dark-surface:#1C2128;--dark-border:rgba(255,255,255,0.06);
+  --text:#E6EDF3;--text-muted:#8B949E;--text-dim:#484F58;
+  --accent-blue:#58A6FF;--accent-green:#3FB950;--accent-red:#F85149;--accent-purple:#BC8CFF;
+  --radius:16px;--radius-sm:10px;--radius-xs:6px;
+  --font:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
+  --glass:rgba(255,255,255,0.03);--glass-border:rgba(255,255,255,0.06);
+  --glow-orange:0 0 80px rgba(255,153,0,0.15);
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:var(--dark);color:var(--text);font-family:var(--font);line-height:1.7;overflow-x:hidden}
+a{color:var(--orange);text-decoration:none}
+::selection{background:var(--orange);color:#000}
+
+/* ═══════════ ANIMATED BACKGROUND SHAPES ═══════════ */
+.bg-shapes{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
+.bg-shapes .shape{position:absolute;border-radius:50%;filter:blur(100px);opacity:0.07;animation:float 20s ease-in-out infinite}
+.bg-shapes .s1{width:600px;height:600px;background:var(--orange);top:-10%;right:-5%;animation-delay:0s}
+.bg-shapes .s2{width:400px;height:400px;background:var(--accent-blue);bottom:10%;left:-5%;animation-delay:-7s}
+.bg-shapes .s3{width:500px;height:500px;background:var(--accent-purple);top:50%;right:20%;animation-delay:-14s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(30px,-40px) scale(1.05)}50%{transform:translate(-20px,30px) scale(0.95)}75%{transform:translate(40px,20px) scale(1.02)}}
+
+/* ═══════════ NAVIGATION ═══════════ */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 40px;display:flex;align-items:center;gap:32px;transition:all .4s;backdrop-filter:blur(0px)}
+.navbar.scrolled{background:rgba(13,17,23,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--dark-border);padding:12px 40px;box-shadow:0 4px 30px rgba(0,0,0,0.3)}
+.nav-logo img{height:36px;width:auto}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{color:var(--text-muted);font-size:13px;font-weight:500;padding:6px 14px;border-radius:20px;transition:all .3s;letter-spacing:0.2px}
+.nav-links a:hover,.nav-links a.active{color:var(--orange);background:rgba(255,153,0,0.08)}
+
+/* ═══════════ HERO ═══════════ */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;padding:120px 60px 80px;overflow:hidden}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,153,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,153,0,0.03) 1px,transparent 1px);background-size:60px 60px;animation:gridMove 30s linear infinite}
+@keyframes gridMove{0%{transform:translate(0,0)}100%{transform:translate(60px,60px)}}
+.hero-glow{position:absolute;top:50%;right:0;width:800px;height:800px;background:radial-gradient(circle,rgba(255,153,0,0.08) 0%,transparent 60%);transform:translate(20%,-50%);border-radius:50%;animation:heroGlow 8s ease-in-out infinite}
+@keyframes heroGlow{0%,100%{opacity:0.6;transform:translate(20%,-50%) scale(1)}50%{opacity:1;transform:translate(20%,-50%) scale(1.1)}}
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.hero-content{position:relative;z-index:2;max-width:780px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,153,0,0.1);border:1px solid rgba(255,153,0,0.2);color:var(--orange);font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 20px;border-radius:30px;margin-bottom:32px;opacity:0;animation:fadeUp .8s ease forwards .3s}
+.hero-badge .dot{width:6px;height:6px;background:var(--orange);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.5)}}
+.hero h1{font-size:clamp(2.8rem,5.5vw,4.5rem);font-weight:900;line-height:1.08;letter-spacing:-2px;margin-bottom:28px;opacity:0;animation:fadeUp .8s ease forwards .5s}
+.hero h1 .accent{background:linear-gradient(135deg,var(--orange),var(--orange-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:18px;color:var(--text-muted);max-width:560px;line-height:1.8;margin-bottom:40px;opacity:0;animation:fadeUp .8s ease forwards .7s}
+.hero-stats{display:flex;gap:40px;opacity:0;animation:fadeUp .8s ease forwards .9s}
+.hero-stat .num{font-size:42px;font-weight:900;background:linear-gradient(135deg,var(--orange),var(--orange-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-stat .label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-top:2px}
+.hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-dim);font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;animation:fadeUp .8s ease forwards 1.2s;opacity:0}
+.hero-scroll .line{width:1px;height:50px;background:linear-gradient(to bottom,var(--orange),transparent);animation:scrollLine 2s ease-in-out infinite}
+@keyframes scrollLine{0%,100%{transform:scaleY(0.5);opacity:0.3}50%{transform:scaleY(1);opacity:1}}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+.hero h1,.hero-sub,.hero-badge,.hero-stats,.hero-scroll{transform:translateY(30px)}
+
+/* ═══════════ SECTIONS ═══════════ */
+.section{position:relative;z-index:1;padding:100px 60px;max-width:1200px;margin:0 auto}
+.section-sm{padding:80px 60px}
+.section-header{display:flex;align-items:center;gap:20px;margin-bottom:48px}
+.section-num{font-size:64px;font-weight:900;background:linear-gradient(135deg,var(--orange),transparent);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0.3;line-height:1}
+.section-title{font-size:32px;font-weight:800;letter-spacing:-0.5px}
+.section-subtitle{font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:3px;font-weight:600}
+.body-text{color:var(--text-muted);font-size:15px;line-height:1.85;margin-bottom:24px;max-width:900px}
+.body-text:last-child{margin-bottom:0}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--dark-border),var(--orange),var(--dark-border),transparent);margin:0 60px}
+
+/* ═══════════ GLASS CARDS ═══════════ */
+.card{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);padding:32px;backdrop-filter:blur(10px);transition:all .4s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,153,0,0.3),transparent);opacity:0;transition:opacity .4s}
+.card:hover{border-color:rgba(255,153,0,0.15);transform:translateY(-4px);box-shadow:var(--glow-orange)}
+.card:hover::before{opacity:1}
+
+/* ═══════════ SCORE CARDS ═══════════ */
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:32px}
+.score-card{background:var(--dark-card);border:1px solid var(--dark-border);border-radius:var(--radius);padding:28px;position:relative;overflow:hidden;transition:all .4s}
+.score-card:hover{border-color:rgba(255,153,0,0.2);box-shadow:var(--glow-orange)}
+.score-card .cat-tag{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:20px;margin-bottom:14px;display:inline-block}
+.cat-ls{background:rgba(88,166,255,0.1);color:var(--accent-blue)}
+.cat-od{background:rgba(255,153,0,0.1);color:var(--orange)}
+.cat-ip{background:rgba(63,185,80,0.1);color:var(--accent-green)}
+.score-card .dim-name{font-size:15px;font-weight:700;margin-bottom:12px}
+.score-card .score-row{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.score-card .score-val{font-size:36px;font-weight:900;background:linear-gradient(135deg,var(--orange),var(--orange-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.score-card .band-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px}
+.band-developing{background:rgba(248,81,73,0.12);color:var(--accent-red)}
+.band-emerging{background:rgba(255,153,0,0.12);color:var(--orange-light)}
+.band-established{background:rgba(63,185,80,0.12);color:var(--accent-green)}
+.score-bar{height:4px;background:var(--dark-surface);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.score-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--orange),var(--orange-light));width:0;transition:width 1.5s ease}
+.score-card .note{font-size:12px;color:var(--text-dim);line-height:1.5}
+
+/* ═══════════ CHARTS ═══════════ */
+.chart-container{background:var(--dark-card);border:1px solid var(--dark-border);border-radius:var(--radius);padding:32px;margin-top:32px}
+.chart-wrap{max-width:500px;margin:0 auto}
+.chart-title{font-size:14px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:20px}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:32px}
+
+/* ═══════════ CALLOUT BOX ═══════════ */
+.callout{display:flex;align-items:center;gap:24px;background:linear-gradient(135deg,rgba(255,153,0,0.06),rgba(255,153,0,0.02));border:1px solid rgba(255,153,0,0.12);border-radius:var(--radius);padding:28px 32px;margin:32px 0}
+.callout-num{font-size:48px;font-weight:900;background:linear-gradient(135deg,var(--orange),var(--orange-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex-shrink:0}
+.callout-text{font-size:14px;color:var(--text-muted);line-height:1.7}
+
+/* ═══════════ THEME CARDS ═══════════ */
+.themes-grid{display:grid;gap:16px;margin-top:32px}
+.theme-card{background:var(--dark-card);border:1px solid var(--dark-border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .3s}
+.theme-card:hover{border-color:rgba(255,153,0,0.15)}
+.theme-header{padding:24px 28px;display:flex;align-items:center;justify-content:space-between}
+.theme-header h3{font-size:15px;font-weight:700;flex:1}
+.theme-toggle{width:28px;height:28px;border-radius:50%;background:rgba(255,153,0,0.1);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--orange);transition:transform .3s;flex-shrink:0}
+.theme-card.open .theme-toggle{transform:rotate(180deg)}
+.theme-body{padding:0 28px;max-height:0;overflow:hidden;transition:max-height .4s ease,padding .4s}
+.theme-card.open .theme-body{max-height:300px;padding:0 28px 24px}
+.theme-body p{font-size:14px;color:var(--text-muted);line-height:1.8}
+
+/* ═══════════ RECOMMENDATION CARDS ═══════════ */
+.rec-grid{display:grid;gap:16px;margin-top:32px}
+.rec-card{background:var(--dark-card);border:1px solid var(--dark-border);border-radius:var(--radius);padding:28px;display:grid;grid-template-columns:60px 1fr;gap:20px;transition:all .3s}
+.rec-card:hover{border-color:rgba(255,153,0,0.15);box-shadow:var(--glow-orange)}
+.rec-num{font-size:32px;font-weight:900;color:var(--orange);display:flex;align-items:start;justify-content:center;padding-top:4px}
+.rec-title{font-size:16px;font-weight:700;margin-bottom:8px}
+.rec-desc{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:14px}
+.rec-tags{display:flex;gap:8px;flex-wrap:wrap}
+.rec-tag{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;letter-spacing:0.5px}
+.tag-high{background:rgba(248,81,73,0.1);color:var(--accent-red)}
+.tag-medium{background:rgba(255,153,0,0.1);color:var(--orange)}
+.tag-immediate{background:rgba(248,81,73,0.2);color:var(--accent-red);border:1px solid rgba(248,81,73,0.3)}
+.tag-horizon{background:rgba(88,166,255,0.1);color:var(--accent-blue)}
+.tag-target{background:rgba(63,185,80,0.1);color:var(--accent-green)}
+
+/* ═══════════ REFERENCES ═══════════ */
+.ref-list{list-style:none;margin-top:24px}
+.ref-list li{font-size:13px;color:var(--text-muted);padding:10px 0;border-bottom:1px solid var(--dark-border);line-height:1.6}
+.ref-list li:last-child{border-bottom:none}
+
+/* ═══════════ PESTLE TABLE ═══════════ */
+.pestle-wrap{overflow-x:auto;margin-top:24px}
+.pestle{width:100%;border-collapse:separate;border-spacing:0;border-radius:var(--radius);overflow:hidden;font-size:14px}
+.pestle thead th{background:var(--navy);color:#fff;padding:16px 20px;text-align:left;font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.pestle tbody td{padding:16px 20px;color:var(--text-muted);border-bottom:1px solid var(--dark-border);vertical-align:top;background:var(--dark-card)}
+.pestle tbody tr{transition:background .2s}
+.pestle tbody tr:hover td{background:var(--dark-surface)}
+.pestle-factor{font-weight:700;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap;border-left:4px solid;padding-left:16px !important}
+.pf-p{border-left-color:#58A6FF;color:#58A6FF !important}
+.pf-ec{border-left-color:#3FB950;color:#3FB950 !important}
+.pf-s{border-left-color:#BC8CFF;color:#BC8CFF !important}
+.pf-t{border-left-color:var(--orange);color:var(--orange) !important}
+.pf-l{border-left-color:#39D2C0;color:#39D2C0 !important}
+.pf-en{border-left-color:#56D364;color:#56D364 !important}
+
+/* ═══════════ STICKY NOTES CULTURE MAP ═══════════ */
+.culture-map{display:flex;flex-direction:column;gap:28px;margin-top:28px}
+.cm-col-header{padding:12px 24px;font-weight:800;font-size:12px;letter-spacing:2.5px;color:#fff;text-transform:uppercase;border-radius:var(--radius-sm);text-align:center;margin-bottom:16px}
+.cm-notes-grid{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.cm-note{position:relative;width:195px;min-height:105px;padding:20px 16px 14px;border-radius:4px;font-size:12.5px;line-height:1.55;font-weight:500;box-shadow:3px 4px 14px rgba(0,0,0,0.4);transition:transform .3s,opacity .35s,box-shadow .3s;cursor:default}
+.cm-note:hover{transform:translateY(-5px) rotate(0deg) !important;box-shadow:5px 8px 24px rgba(0,0,0,0.5);z-index:2}
+.cm-note-outcome{background:linear-gradient(135deg,#BBDEFB,#90CAF9);color:#0D47A1}
+.cm-note-behaviour{background:linear-gradient(135deg,#FFE0B2,#FFCC80);color:#E65100}
+.cm-note-enabler{background:linear-gradient(135deg,#C8E6C9,#A5D6A7);color:#1B5E20}
+.cm-note-blocker{background:linear-gradient(135deg,#FFCDD2,#EF9A9A);color:#B71C1C}
+.cm-note-icon{font-size:20px;margin-bottom:5px;display:block}
+.cm-note-tags{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap}
+.cm-tag{font-size:9px;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:3px;font-weight:700;background:rgba(0,0,0,0.1);color:rgba(0,0,0,0.55)}
+.cm-strength{font-size:9px;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:3px;font-weight:700}
+.cm-str-critical{background:rgba(183,28,28,0.25);color:#B71C1C}
+.cm-str-strong{background:rgba(0,0,0,0.1);color:rgba(0,0,0,0.55)}
+.cm-str-moderate{background:rgba(0,0,0,0.06);color:rgba(0,0,0,0.45)}
+.cm-tape{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:38px;height:13px;background:rgba(255,255,255,0.35);border-radius:1px}
+.cm-arrow{text-align:center;font-size:26px;color:var(--orange);letter-spacing:14px}
+.cm-eb-grid{display:grid;grid-template-columns:1fr 60px 1fr;gap:0;align-items:start}
+.cm-vs{display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:55px}
+.cm-vs-label{font-size:10px;font-weight:800;letter-spacing:2px;color:var(--orange);text-transform:uppercase}
+.cm-vs-icon{font-size:34px;animation:pulse 2s ease-in-out infinite}
+.cm-filter{display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.cm-filter-btn{background:var(--dark-card);border:1px solid var(--dark-border);color:var(--text-muted);padding:7px 18px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;transition:all .25s;font-family:var(--font)}
+.cm-filter-btn:hover{border-color:var(--orange);color:var(--text)}
+.cm-filter-btn.active{background:var(--orange);color:#000;border-color:var(--orange)}
+
+/* ═══════════ RESPONDENT TABLE ═══════════ */
+.resp-table-wrap{overflow-x:auto;margin-top:24px;border-radius:var(--radius);border:1px solid var(--dark-border)}
+.resp-table{width:100%;border-collapse:collapse;font-size:13px}
+.resp-table thead th{background:var(--navy);color:#fff;padding:12px 10px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;position:sticky;top:0;cursor:pointer}
+.resp-table thead th:hover{background:var(--navy-light)}
+.resp-table tbody td{padding:10px;border-bottom:1px solid var(--dark-border);color:var(--text-muted);text-align:center;background:var(--dark-card)}
+.resp-table tbody tr:hover td{background:var(--dark-surface)}
+
+/* ═══════════ FOOTER ═══════════ */
+.footer{text-align:center;padding:40px 60px;color:var(--text-dim);font-size:13px;border-top:1px solid var(--dark-border);position:relative;z-index:1}
+.footer .aws-f{color:var(--orange);font-weight:800;font-size:16px;letter-spacing:2px}
+
+/* ═══════════ SCROLL ANIMATION ═══════════ */
+.fade-in{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+/* ═══════════ RESPONSIVE ═══════════ */
+@media(max-width:900px){
+  .hero{padding:100px 24px 60px}
+  .section,.section-sm{padding:60px 24px}
+  .score-grid{grid-template-columns:1fr}
+  .charts-grid{grid-template-columns:1fr}
+  .navbar{padding:12px 16px}
+  .nav-links a{font-size:11px;padding:4px 8px}
+  .hero h1{font-size:2.2rem}
+  .hero-stats{flex-wrap:wrap;gap:24px}
+  .cm-eb-grid{grid-template-columns:1fr}
+  .cm-vs{flex-direction:row;padding-top:0}
+  .rec-card{grid-template-columns:1fr}
+  .rec-num{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Background shapes -->
+<div class="bg-shapes">
+  <div class="shape s1"></div>
+  <div class="shape s2"></div>
+  <div class="shape s3"></div>
+</div>
+<!-- ═══════════ NAVIGATION ═══════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-logo"><img src="data:image/png;base64,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" alt="AWS"></div>
+  <div class="nav-links">
+    <a href="#intro">Introduction</a>
+    <a href="#method">Methodology</a>
+    <a href="#findings">Findings</a>
+    <a href="#discussion">Discussion</a>
+    <a href="#recs">Recommendations</a>
+    <a href="#conclusion">Conclusion</a>
+    <a href="#refs">References</a>
+    <a href="#app-a">Appendix A</a>
+    <a href="#app-b">Appendix B</a>
+    <a href="#app-c">PESTLE</a>
+    <a href="#app-d">Culture Map</a>
+  </div>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero" id="top">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="dot"></span>AWS AGS UKI &mdash; Innovation Diagnostic</div>
+    <h1>Everyone&rsquo;s Job,<br>No One&rsquo;s<br><span class="accent">Responsibility</span></h1>
+    <p class="hero-sub">Innovation Culture Readiness Assessment and Report. Strategyzer diagnostic across 41 respondents, 9 dimensions, revealing a concentrated deficit in incentive architecture.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">3.23</div><div class="label">Overall Mean</div></div>
+      <div class="hero-stat"><div class="num">41</div><div class="label">Respondents</div></div>
+      <div class="hero-stat"><div class="num">2.39</div><div class="label">Rewards Score</div></div>
+      <div class="hero-stat"><div class="num">9</div><div class="label">Dimensions</div></div>
+    </div>
+  </div>
+  <div class="hero-scroll" onclick="document.getElementById('intro').scrollIntoView({behavior:'smooth'})">
+    <span>Scroll</span>
+    <div class="line"></div>
+  </div>
+</section>
+
+<!-- ═══════════ 01 INTRODUCTION ═══════════ -->
+<div class="divider"></div>
+<div class="section" id="intro">
+  <div class="section-header fade-in"><div class="section-num">01</div><div><div class="section-subtitle">Overview</div><div class="section-title">Introduction</div></div></div>
+  <p class="body-text fade-in">Amazon Web Services (AWS) operates in a market defined by accelerating uncertainty: generative AI is reshaping customer expectations, hyperscaler competition is intensifying, and enterprise buyers increasingly evaluate providers on co-innovation capacity, not merely infrastructure (Teece, 2018). This report examines innovation culture readiness in the AWS Global Sales (AGS) organisation within AWS UK and Ireland (UKI), a field sales function of approximately 250 professionals. A focused PESTLE analysis (Appendix C) confirms that the external environment increasingly demands innovation at the point of customer contact; the question is whether AGS UKI's internal culture can keep pace.</p>
+  <p class="body-text fade-in">The study is motivated by a tension I observe daily as a Principal Account Manager. AWS's corporate narrative positions every employee as an innovator: 'Invent and Simplify' is recited in hiring and performance reviews, underpinned by Working Backwards (Bryar &amp; Carr, 2021). Yet the operational reality of a quota-carrying sales function creates conditions that may constrain the very innovation the culture claims to enable. Pisano (2019) argues innovative cultures require uncomfortable counterparts including rigorous discipline; Tidd and Bessant (2020) reinforce this, identifying dedicated routines for search, selection, implementation, and learning as preconditions. What remains unclear is whether AGS UKI possesses the architecture to convert cultural aspiration into competitive practice.</p>
+  <p class="body-text fade-in">Using a Strategyzer Innovation Culture Readiness diagnostic (Osterwalder et al., 2020) administered to 41 respondents, findings are analysed through organisational ambidexterity (O'Reilly &amp; Tushman, 2013), dynamic capabilities (Teece, 2018), and the structural tensions of managing exploitation and exploration simultaneously (Dodd &amp; Favaro, 2006). The argument that emerges from the data is specific: AGS UKI's innovation deficit sits in its incentive architecture, and the strategic consequences, for customer value creation and the organisation's ability to compete in a market moving faster than its internal systems, are compounding.</p>
+</div>
+
+<!-- ═══════════ 02 METHODOLOGY ═══════════ -->
+<div class="divider"></div>
+<div class="section" id="method">
+  <div class="section-header fade-in"><div class="section-num">02</div><div><div class="section-subtitle">Research Design</div><div class="section-title">Methodology</div></div></div>
+  <p class="body-text fade-in">The Strategyzer Innovation Culture Readiness survey (Osterwalder et al., 2020) was deployed digitally to AGS UKI in January 2026. The instrument evaluates nine dimensions across three categories: Leadership Support (Strategic Guidance, Resource Allocation, Portfolio Management), Organisational Design (Legitimacy and Power, Bridge to the Core, Rewards and Incentives), and Innovation Practice (Innovation Tools, Process Management, Innovation Skills). Each dimension uses a five-point Likert scale with anchored descriptors, supplemented with qualitative open-text questions enabling triangulation between what respondents score and what they explain.</p>
+  <p class="body-text fade-in">Forty-one responses were received (approximately 16% of the AGS UKI population), including individual contributors, team leads, senior managers, and ITP (Innovation and Transformation Programmes) team members. The survey was anonymised, preventing stratified analysis by role or tenure, and the convenience sample means findings are indicative rather than generalisable. My insider position gives the analysis contextual depth but introduces confirmation bias risk, which I have tried to navigate transparently.</p>
+  <p class="body-text fade-in">Quantitative data were analysed using descriptive statistics and Pearson correlations. Qualitative responses were subjected to thematic analysis following Braun and Clarke's (2006) six-phase approach (Appendix A). The diagnostic warrants critical appraisal: it lacks psychometric validation and its five-point scale introduces central tendency bias. More fundamentally, it captures how people experience innovation culture through self-report, not necessarily how the organisation performs innovation as a process of search, selection, implementation, and value creation (Tidd &amp; Bessant, 2020). I treat it as a problem-diagnosis tool consistent with Rumelt's (2022) challenge-led approach: identifying where the organisation believes its constraints lie is itself strategically useful. The results were additionally mapped to Strategyzer's Culture Map framework (Appendix D) to visualise the relationship between outcomes, behaviours, and the formal and informal enablers and blockers shaping AGS UKI's innovation culture.</p>
+</div>
+
+<!-- ═══════════ 03 FINDINGS ═══════════ -->
+<div class="divider"></div>
+<div class="section" id="findings">
+  <div class="section-header fade-in"><div class="section-num">03</div><div><div class="section-subtitle">Quantitative &amp; Qualitative Results</div><div class="section-title">Findings</div></div></div>
+
+  <div class="callout fade-in">
+    <div class="callout-num">3.23</div>
+    <div class="callout-text">The overall mean across nine dimensions places AGS UKI in the <strong>'Emerging'</strong> band, but that aggregate obscures the real story: significant inter-dimensional variance revealing an organisation with the raw materials for innovation but no mechanism to convert them into output.</div>
+  </div>
+
+  <p class="body-text fade-in">Figure 1 reveals an asymmetric profile. The radar plot is broadly circular across eight dimensions (3.0–3.5) but collapses at Rewards and Incentives (2.39), dragging Organisational Design (3.15) below Leadership Support (3.24) and Innovation Practice (3.31). The deficit is concentrated: AGS UKI has invested in capability but has not aligned its incentive architecture to activate it. The constraint is internal, which means it is addressable.</p>
+
+  <div id="scoreCardsContainer" class="fade-in"></div>
+
+  <div class="charts-grid">
+    <div class="chart-container fade-in"><div class="chart-title">Radar Profile</div><div class="chart-wrap"><canvas id="radarChart"></canvas></div></div>
+    <div class="chart-container fade-in"><div class="chart-title">Dimension Scores (Ranked)</div><canvas id="barChart" height="300"></canvas></div>
+  </div>
+
+  <div class="callout fade-in" style="margin-top:32px">
+    <div class="callout-num">1.2</div>
+    <div class="callout-text">The interquartile range in individual means (2.67–3.89), with scores ranging from 5.00 to 1.33, reflects not individual disagreement but a structural access problem. AGS UKI functions as multiple sub-organisations within one firm.</div>
+  </div>
+
+  <p class="body-text fade-in">Strategic Guidance (3.46) and Legitimacy and Power (3.49) suggest leadership intent and formal authority to innovate are present; the organisation has permission but not incentive. Innovation Tools (3.12) clusters at the midpoint, with 46% scoring exactly 3, indicating tools exist but are not salient enough to function as enablers. The correlation analysis shows structural relationships. Bridge to the Core and Innovation Skills (r = 0.73) suggests collaboration and talent capability are linked. The Portfolio Management and Rewards correlation (r = 0.72) is more telling: respondents understand incentive misalignment and portfolio underinvestment as facets of the same problem.</p>
+
+  <p class="body-text fade-in">Five themes emerged from the verbatim responses (see Appendix A). Competing priorities and resource cannibalisation emerged as a persistent pattern: innovation initiatives such as GenAI Surge draw from the same resource pool as core operations rather than receiving additional investment. This links to the Resource Allocation score of 3.02 and to Dodd and Favaro's (2006) tension between the whole and the parts. Finally, Working Backwards was recognised but unevenly applied, explaining the Process Management score of 3.34.</p>
+</div>
+
+<!-- ═══════════ 04 DISCUSSION ═══════════ -->
+<div class="divider"></div>
+<div class="section" id="discussion">
+  <div class="section-header fade-in"><div class="section-num">04</div><div><div class="section-subtitle">Analysis</div><div class="section-title">Discussion</div></div></div>
+
+  <h3 class="fade-in" style="font-size:20px;font-weight:800;margin-bottom:20px;color:var(--orange)">4.1 The Ambidexterity Paradox at AWS</h3>
+  <p class="body-text fade-in">The data make more sense through the lens of organisational ambidexterity (March, 1991; O'Reilly &amp; Tushman, 2013). AWS's corporate architecture exemplifies the 'ambidextrous organisation'; Working Backwards (Bryar &amp; Carr, 2021) is its most visible expression. The survey data suggest this does not cascade to AGS UKI. The field function operates in exploitation mode: incentives reward execution over experimentation, sales structures are designed for repeatability, and leadership defaults to measurable short-term outputs when the quarter is tight.</p>
+  <p class="body-text fade-in">Framed as a strategy problem, this is misallocation shaped by structural incentives, not resource scarcity. March (1991) identifies why the field remains locked in exploitation, Dodd and Favaro (2006) where the misallocation concentrates, and Teece (2018) what it costs: the inability to reconfigure assets where customer needs are shifting fastest. AGS UKI's exploitation-dominant mode also reflects what Brandenburger (2019) describes as the exclusion of creative strategic thinking from execution-focused structures. Search and selection routines exist (Working Backwards, PRFAQ), but implementation and learning remain under-resourced locally. The ITP team is three UK-focused staff for 250 people.</p>
+
+  <div class="callout fade-in">
+    <div class="callout-num">2.39</div>
+    <div class="callout-text">The only <strong>'Developing'</strong> dimension and 0.63 points below the next-lowest, Rewards &amp; Incentives represents a fundamental misalignment between what the organisation values (innovation) and what it rewards (execution).</div>
+  </div>
+
+  <h3 class="fade-in" style="font-size:20px;font-weight:800;margin-bottom:20px;color:var(--orange)">4.2 The Incentive Architecture Gap</h3>
+  <p class="body-text fade-in">Kerr's (1975) observation that organisations reward A while hoping for B is visible in every quarterly cycle. This challenges the Strategyzer model itself. The diagnostic treats dimensions as co-equal, but the data suggest otherwise: incentive alignment functions as a load-bearing element without which other dimensions cannot produce results. Strong Process Management (3.34) and Innovation Skills (3.46) remain latent if the incentive architecture penalises innovation time.</p>
+  <p class="body-text fade-in">The Rewards-to-Portfolio Management correlation (r = 0.72) supports systemic linkage. Nagji and Tuff (2012) propose a 70/20/10 innovation portfolio; AGS UKI operates closer to 90/10/0. That is a growth ceiling, not a growth strategy. Teece's (2018) argument that dynamic capabilities require executive commitment to reconfiguring assets reinforces the urgency.</p>
+
+  <h3 class="fade-in" style="font-size:20px;font-weight:800;margin-bottom:20px;color:var(--orange)">4.3 Challenging the Thesis</h3>
+  <p class="body-text fade-in">The strongest counter-argument is that the Strategyzer diagnostic is the wrong tool for evaluating AWS. The argument is that AWS has transcended formal structures because innovation is culturally embedded. A related argument holds that AGS UKI's role is execution and expecting a field sales function to innovate is a category error.</p>
+  <p class="body-text fade-in">Both counter-arguments have force, but the data do not support them. If innovation culture were genuinely embedded, we would expect convergence, not a 1.2-point IQR. The specialisation argument underestimates how rapidly enterprise customers now expect account teams to co-innovate. And the post-RIF environment has eroded the psychological safety that cultural embedding depends upon. As Edmondson (1999) demonstrated, psychological safety is a contingent state destroyed by threat-rigidity responses.</p>
+</div>
+
+<!-- ═══════════ 05 RECOMMENDATIONS ═══════════ -->
+<div class="divider"></div>
+<div class="section" id="recs">
+  <div class="section-header fade-in"><div class="section-num">05</div><div><div class="section-subtitle">Action Plan</div><div class="section-title">Recommendations</div></div></div>
+  <p class="body-text fade-in">Each recommendation targets a specific constraint, but they are designed to work together. Klein and Knight (2005) identify key preconditions for innovation implementation, among them climate, management support, and resource availability, and AGS UKI fails on at least two locally. The logic is sequential, consistent with Kotter's (2012) emphasis on urgency and coalition before embedding change: restore safety (5), realign incentives (1–2), activate latent capability (3–4).</p>
+  <div id="recsContainer" class="fade-in"></div>
+</div>
+
+<!-- ═══════════ 06 CONCLUSION ═══════════ -->
+<div class="divider"></div>
+<div class="section" id="conclusion">
+  <div class="section-header fade-in"><div class="section-num">06</div><div><div class="section-subtitle">Summary</div><div class="section-title">Conclusion</div></div></div>
+  <p class="body-text fade-in">AGS UKI possesses genuine cultural assets but a structural gap between aspiration and incentive architecture. The people are not the constraint; the systems governing daily behaviour are still optimised for exploitation, and innovation cannot be institutionalised within that architecture. The Strategyzer diagnostic has surfaced a concentrated deficit in Rewards and Incentives that qualitative data confirm is understood, structurally consequential, and increasingly misaligned with where AGS UKI needs to compete over the next two to three years.</p>
+  <p class="body-text fade-in">The deeper paradox is this: the very culture that makes AWS exceptional at corporate-level innovation may inhibit it at the field level. 'Day 1' thinking distributes ownership so completely that no one accumulates the structural authority to protect exploration from operational pressure. The culture substitutes identity for architecture, and in a post-RIF environment where psychological safety has been eroded, identity alone is insufficient. The recommendations propose a sequenced theory of change: restore safety, realign incentives, activate latent capability. Whether leadership acts is not a research question but a strategic one, with competitive consequences that compound with each quarter of inaction.</p>
+</div>
+
+<!-- ═══════════ REFERENCES ═══════════ -->
+<div class="divider"></div>
+<div class="section-sm" id="refs" style="max-width:1200px;margin:0 auto">
+  <div class="section-header fade-in"><div class="section-num">—</div><div><div class="section-title">References</div></div></div>
+  <ul class="ref-list fade-in" id="refList"></ul>
+</div>
+
+<!-- ═══════════ APPENDIX A ═══════════ -->
+<div class="divider"></div>
+<div class="section" id="app-a">
+  <div class="section-header fade-in"><div class="section-num">A</div><div><div class="section-subtitle">Appendix</div><div class="section-title">Qualitative Thematic Analysis</div></div></div>
+  <div id="themesContainer" class="fade-in"></div>
+</div>
+
+<!-- ═══════════ APPENDIX B ═══════════ -->
+<div class="divider"></div>
+<div class="section" id="app-b">
+  <div class="section-header fade-in"><div class="section-num">B</div><div><div class="section-subtitle">Appendix</div><div class="section-title">Individual Response Data</div></div></div>
+  <div id="respTableContainer" class="fade-in"></div>
+</div>
+
+<!-- ═══════════ APPENDIX C: PESTLE ═══════════ -->
+<div class="divider"></div>
+<div class="section" id="app-c">
+  <div class="section-header fade-in"><div class="section-num">C</div><div><div class="section-subtitle">Appendix</div><div class="section-title">PESTLE Analysis</div></div></div>
+  <p class="body-text fade-in">The following PESTLE analysis summarises the key external forces shaping innovation demands on AGS UKI's field sales function.</p>
+  <div class="pestle-wrap fade-in">
+    <table class="pestle">
+      <thead><tr><th>Factor</th><th>Key Forces</th><th>Implication for AGS UKI Innovation</th></tr></thead>
+      <tbody>
+        <tr><td class="pestle-factor pf-p">Political</td><td>UK AI Safety Institute regulation; Government digital transformation agenda; public sector procurement reform</td><td>Regulatory complexity creates demand for customer co-innovation on compliance; AGS must innovate at point of contact</td></tr>
+        <tr><td class="pestle-factor pf-ec">Economic</td><td>Enterprise IT budget pressure; hyperscaler price competition; GenAI investment cycle accelerating</td><td>Customers evaluate providers on value beyond infrastructure; co-innovation capability becomes a differentiator</td></tr>
+        <tr><td class="pestle-factor pf-s">Social</td><td>Post-RIF workforce anxiety; talent competition for AI skills; hybrid working norms</td><td>Psychological safety erosion constrains experimentation; innovation skills concentrate in specialist teams</td></tr>
+        <tr><td class="pestle-factor pf-t">Technological</td><td>GenAI reshaping customer expectations; cloud-native migration accelerating; platform convergence</td><td>Field teams must sense emerging needs; innovation cannot remain corporate-only if customer demands are local</td></tr>
+        <tr><td class="pestle-factor pf-l">Legal</td><td>UK GDPR and data sovereignty; AI governance frameworks emerging; cross-border compliance complexity</td><td>Compliance innovation increasingly required at account level, not just corporate legal function</td></tr>
+        <tr><td class="pestle-factor pf-en">Environmental</td><td>Net-zero cloud commitments; ESG as procurement criterion; sustainability reporting mandates</td><td>Sustainability innovation creates new customer value propositions; requires field-level awareness and capability</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════ APPENDIX D: CULTURE MAP ═══════════ -->
+<div class="divider"></div>
+<div class="section" id="app-d">
+  <div class="section-header fade-in"><div class="section-num">D</div><div><div class="section-subtitle">Appendix</div><div class="section-title">Strategyzer Culture Map</div></div></div>
+  <p class="body-text fade-in">The Culture Map applies Osterwalder et al.'s (2020) framework to visualise how AGS UKI's innovation culture operates in practice. Use the filter buttons to isolate formal/informal or critical factors.</p>
+  <div id="cultureMapContainer" class="fade-in"></div>
+</div>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<div class="footer">
+  <span class="aws-f">aws</span> &nbsp;|&nbsp; Innovation Culture Readiness Report &nbsp;|&nbsp; BEMM116DA: Strategy and Innovation &nbsp;|&nbsp; University of Exeter Business School &nbsp;|&nbsp; March 2026
+</div>
+
+<script>
+// ═══════════ HERO PARTICLE NETWORK ═══════════
+(function(){
+  const canvas = document.getElementById('heroCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W,H,nodes=[],keywords=[],mouse={x:-999,y:-999};
+  const WORDS=['Innovation','Culture','Strategy','Experimentation','Day 1','Working Backwards','Customer','Leadership','Agility','Collaboration','Readiness','Incentives','Enablers','Blockers','Tension','Psychological Safety','Co-innovation','ITP','Disruption','GenAI','Ambidexterity','Risk Tolerance','Autonomy','Resources'];
+  const dpr = window.devicePixelRatio||1;
+
+  function resize(){
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function init(){
+    nodes=[];
+    const count = Math.min(55, Math.floor(W*H/14000));
+    for(let i=0;i<count;i++){
+      nodes.push({
+        x:Math.random()*W, y:Math.random()*H,
+        vx:(Math.random()-.5)*.35, vy:(Math.random()-.5)*.25,
+        r:Math.random()*2.2+1,
+        isGreen:Math.random()>.5,
+        alpha:Math.random()*.25+.08
+      });
+    }
+    keywords=[];
+    for(let i=0;i<7;i++){
+      keywords.push({
+        text:WORDS[Math.floor(Math.random()*WORDS.length)],
+        x:Math.random()*W, y:Math.random()*H,
+        vx:(Math.random()-.5)*.18, vy:(Math.random()-.5)*.12,
+        alpha:0, target:Math.random()*.07+.025, fade:Math.random()*.0015+.0008,
+        size:Math.random()*10+12
+      });
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const t = Date.now()*.001;
+
+    // Connections
+    for(let i=0;i<nodes.length;i++){
+      for(let j=i+1;j<nodes.length;j++){
+        const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<130){
+          ctx.strokeStyle=`rgba(255,153,0,${(1-dist/130)*.1})`;
+          ctx.lineWidth=.5;
+          ctx.beginPath(); ctx.moveTo(nodes[i].x,nodes[i].y); ctx.lineTo(nodes[j].x,nodes[j].y); ctx.stroke();
+        }
+      }
+    }
+
+    // Nodes
+    nodes.forEach(n=>{
+      n.x+=n.vx; n.y+=n.vy;
+      if(n.x<0||n.x>W) n.vx*=-1;
+      if(n.y<0||n.y>H) n.vy*=-1;
+      const mdx=n.x-mouse.x, mdy=n.y-mouse.y, md=Math.sqrt(mdx*mdx+mdy*mdy);
+      const boost = md<160 ? (1-md/160)*.45 : 0;
+      const p = Math.sin(t*2+n.x*.01)*.08;
+      const a = Math.max(0,n.alpha+p+boost);
+      ctx.fillStyle = n.isGreen ? `rgba(63,185,80,${a})` : `rgba(248,81,73,${a})`;
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r+boost*3,0,Math.PI*2); ctx.fill();
+    });
+
+    // Keywords
+    keywords.forEach(k=>{
+      k.x+=k.vx; k.y+=k.vy;
+      if(k.x<-80||k.x>W+80) k.vx*=-1;
+      if(k.y<-20||k.y>H+20) k.vy*=-1;
+      k.alpha+=k.fade;
+      if(k.alpha>=k.target||k.alpha<=0){
+        k.fade*=-1;
+        if(k.alpha<=0){ k.text=WORDS[Math.floor(Math.random()*WORDS.length)]; k.x=Math.random()*W; k.y=Math.random()*H; k.target=Math.random()*.07+.025; }
+      }
+      ctx.font=`600 ${k.size}px 'Plus Jakarta Sans',sans-serif`;
+      ctx.fillStyle=`rgba(255,255,255,${Math.max(0,k.alpha)})`;
+      ctx.fillText(k.text,k.x,k.y);
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  const hero = document.querySelector('.hero');
+  hero.addEventListener('mousemove',e=>{ const r=canvas.getBoundingClientRect(); mouse.x=e.clientX-r.left; mouse.y=e.clientY-r.top; });
+  hero.addEventListener('mouseleave',()=>{ mouse.x=-999; mouse.y=-999; });
+  window.addEventListener('resize',()=>{ resize(); init(); });
+  resize(); init(); draw();
+})();
+
+// ═══════════ DATA ═══════════
+const dimensions = [
+  { name: "Strategic Guidance", mean: 3.46, sd: 0.98, median: 3.0, band: "Emerging", note: "Moderate consensus; 36.6% scored 3", cat: "Leadership Support" },
+  { name: "Resource Allocation", mean: 3.02, sd: 1.04, median: 3.0, band: "Emerging", note: "Widest bimodal split after Rewards", cat: "Leadership Support" },
+  { name: "Portfolio Management", mean: 3.22, sd: 1.08, median: 3.0, band: "Emerging", note: "Negatively skewed; 41.5% scored 3–4", cat: "Leadership Support" },
+  { name: "Legitimacy & Power", mean: 3.49, sd: 1.08, median: 4.0, band: "Emerging", note: "Median exceeds mean; right-clustered", cat: "Organisational Design" },
+  { name: "Bridge to the Core", mean: 3.56, sd: 1.12, median: 3.0, band: "Established", note: "Highest mean; strong positive outliers", cat: "Organisational Design" },
+  { name: "Rewards & Incentives", mean: 2.39, sd: 1.20, median: 2.0, band: "Developing", note: "53.7% scored 1–2; clear deficit", cat: "Organisational Design" },
+  { name: "Innovation Tools", mean: 3.12, sd: 1.03, median: 3.0, band: "Emerging", note: "46.3% at midpoint; low differentiation", cat: "Innovation Practice" },
+  { name: "Process Management", mean: 3.34, sd: 1.17, median: 3.0, band: "Emerging", note: "WB recognised but unevenly applied", cat: "Innovation Practice" },
+  { name: "Innovation Skills", mean: 3.46, sd: 1.14, median: 3.0, band: "Emerging", note: "ITP team inflates; sales roles lower", cat: "Innovation Practice" },
+];
+
+const themes = [
+  { title: "Theme 1: The Day 1 Paradox — Innovation as Everyone's Job, No One's Responsibility", body: "The most prevalent theme across responses. Respondents consistently identified a tension between AWS's cultural expectation that innovation is embedded in every role and the operational consequence that formal responsibility, resources, and accountability for innovation become diffuse. This theme maps directly to the Rewards deficit." },
+  { title: "Theme 2: The UKI-to-Global Disconnect", body: "Multiple respondents distinguished between AWS's corporate-level innovation capability and the UKI field organisation's experience. Innovation resources, teams, and decision-making authority are concentrated at EMEA or global level, with limited local translation." },
+  { title: "Theme 3: Fear of Failure and the Post-RIF Chill", body: "Innovation culture is not a stable state; it is fragile, susceptible to shocks unrelated to innovation itself. The 2024 workforce reductions constitute a threat-rigidity response that has eroded psychological safety." },
+  { title: "Theme 4: Competing Priorities and Resource Cannibalisation", body: "Innovation initiatives such as GenAI Surge draw from the same resource pool as core operations rather than receiving additional investment, creating a zero-sum dynamic that undermines both." },
+  { title: "Theme 5: Working Backwards — Recognised but Unevenly Applied", body: "The methodology exists as a search and selection routine but is not consistently embedded as implementation practice, explaining the Process Management score of 3.34." },
+];
+
+const recommendations = [
+  { num: 1, title: "Innovation-Weighted Quarterly Objectives", priority: "High", horizon: "Q3 2026", target: "Rewards & Incentives", desc: "Embed 10% innovation weighting in quarterly objectives for all AGS UKI roles. Even a modest weighting shifts the signal from 'innovation is tolerated' to 'innovation is measured'." },
+  { num: 2, title: "Local Innovation Portfolio Dashboard", priority: "Medium", horizon: "Q4 2026", target: "Portfolio Management", desc: "Create visible portfolio tracking against 70/20/10 benchmark, moving AGS UKI from its current 90/10/0 allocation." },
+  { num: 3, title: "Customer Co-Innovation Sprint Programme", priority: "Medium", horizon: "Q1 2027", target: "Bridge to Core", desc: "Structured 2-week sprints pairing account teams with ITP for customer engagements, activating latent capability at the point of customer contact." },
+  { num: 4, title: "Innovation Skills Certification Path", priority: "Medium", horizon: "Q2 2027", target: "Innovation Skills", desc: "Formal skills pathway linked to career progression, ensuring innovation capability is distributed rather than concentrated in specialist teams." },
+  { num: 5, title: "Psychological Safety Restoration", priority: "Immediate", horizon: "Now", target: "All dimensions", desc: "Team-by-team facilitated sessions to rebuild trust post-RIF. Psychological safety is a team-level construct; restoration must be deployed locally." },
+];
+
+const refs = [
+  'Barney, J. (1991). Firm Resources and Sustained Competitive Advantage. <em>Journal of Management</em>, 17(1), 99–120.',
+  'Brandenburger, A. (2019). Strategy Needs Creativity. <em>Harvard Business Review</em>, 97(2), 57.',
+  'Braun, V., & Clarke, V. (2006). Using thematic analysis in psychology. <em>Qualitative Research in Psychology</em>, 3(2), 77–101.',
+  'Bryar, C., & Carr, B. (2021). <em>Working backwards: Insights, stories, and secrets from inside Amazon</em>. Macmillan.',
+  'Cascio, J. (2020). <em>Facing the age of chaos</em>.',
+  'Christensen, C. M. (2013). <em>The innovator\'s dilemma</em>. Harvard Business Review Press.',
+  'Dodd, D., & Favaro, K. (2006). Managing the right tension. <em>Harvard Business Review</em>, 84(12), 62.',
+  'Edmondson, A. (1999). Psychological Safety and Learning Behavior in Work Teams. <em>Administrative Science Quarterly</em>, 44(2), 350–383.',
+  'Kerr, S. (1975). On the folly of rewarding A, while hoping for B. <em>Academy of Management Journal</em>, 18(4), 769–783.',
+  'Klein, K. J., & Knight, A. P. (2005). Innovation Implementation. <em>Current Directions in Psychological Science</em>, 14(5), 243–246.',
+  'Kotter, J. P. (2012). <em>Leading change</em> (New edition). Harvard Business Review Press.',
+  'March, J. G. (1991). Exploration and Exploitation in Organizational Learning. <em>Organization Science</em>, 2(1), 71–87.',
+  'Nagji, B., & Tuff, G. (2012). Managing your innovation portfolio. <em>Harvard Business Review</em>, 90(5), 66–74.',
+  'O\'Reilly, C. A., & Tushman, M. L. (2013). Organizational Ambidexterity. <em>Academy of Management Perspectives</em>, 27(4), 324–338.',
+  'Osterwalder, A., Pigneur, Y., Etiemble, F., Smith, A., White, C., & Papadakos, T. (2020). <em>The invincible company</em>. Wiley.',
+  'Pisano, G. P. (2019). The Hard Truth About Innovative Cultures. <em>Harvard Business Review</em>, 97(1), 62–71.',
+  'Rumelt, R. (2022). <em>The crux: How leaders become strategists</em>.',
+  'Teece, D. J. (2018). Business models and dynamic capabilities. <em>Long Range Planning</em>, 51(1), 40–49.',
+  'Tidd, J., & Bessant, J. R. (2020). <em>Managing innovation</em> (7th ed.). Wiley.',
+];
+
+const respData = [
+  [1,[3,4,4,4,3,3,3,3,3]],[2,[3,3,2,4,3,2,2,1,2]],[3,[4,4,4,4,3,3,4,5,4]],
+  [4,[5,4,4,4,4,4,4,4,4]],[5,[4,4,4,4,5,2,5,5,5]],[6,[4,2,3,4,5,2,2,4,5]],
+  [7,[4,4,3,4,5,1,2,3,5]],[8,[3,3,1,1,3,1,1,1,2]],[9,[4,4,3,5,5,3,5,4,5]],
+  [10,[3,2,2,3,1,1,1,4,2]],[11,[5,4,5,5,5,4,3,5,5]],[12,[3,1,4,2,3,3,3,3,5]],
+  [13,[3,3,3,3,3,3,3,3,3]],[14,[4,4,4,4,5,4,5,5,5]],[15,[4,4,5,4,5,4,3,3,3]],
+  [16,[3,2,2,5,3,2,3,3,3]],[17,[5,3,3,2,3,3,4,4,3]],[18,[5,5,5,5,5,5,5,5,5]],
+  [19,[2,3,2,2,4,2,3,2,4]],[20,[3,2,2,3,3,1,4,3,4]],[21,[3,3,3,3,2,1,3,2,3]],
+  [22,[4,3,4,4,3,3,3,3,3]],[23,[1,1,1,2,1,1,2,1,2]],[24,[3,1,3,4,4,3,2,1,3]],
+  [25,[3,2,2,2,2,1,4,2,3]],[26,[5,3,3,1,3,1,3,3,1]],[27,[2,2,2,3,5,1,3,5,5]],
+  [28,[3,3,3,4,3,2,3,2,3]],[29,[4,3,4,3,4,4,3,4,5]],[30,[2,2,2,4,4,1,2,4,4]],
+  [31,[3,3,5,4,3,2,3,3,3]],[32,[3,3,3,3,3,1,2,3,2]],[33,[2,1,2,3,2,2,3,4,1]],
+  [34,[4,3,3,4,3,2,3,4,3]],[35,[5,4,4,4,5,3,4,4,4]],[36,[4,4,3,4,4,3,4,3,4]],
+  [37,[2,3,4,4,3,4,3,4,3]],[38,[4,4,4,5,5,4,3,4,4]],[39,[3,3,3,2,3,1,3,3,3]],
+  [40,[4,3,4,3,4,1,2,3,3]],[41,[4,5,5,5,4,4,5,5,3]]
+];
+
+// ═══════════ RENDER FUNCTIONS ═══════════
+const catClass = c => c === 'Leadership Support' ? 'cat-ls' : c === 'Organisational Design' ? 'cat-od' : 'cat-ip';
+const bandClass = b => b === 'Developing' ? 'band-developing' : b === 'Established' ? 'band-established' : 'band-emerging';
+
+function renderScoreCards() {
+  const c = document.getElementById('scoreCardsContainer');
+  if (!c) return;
+  c.innerHTML = '<div class="score-grid">' + dimensions.map(d => `
+    <div class="score-card">
+      <span class="cat-tag ${catClass(d.cat)}">${d.cat}</span>
+      <div class="dim-name">${d.name}</div>
+      <div class="score-row">
+        <span class="score-val">${d.mean.toFixed(2)}</span>
+        <span class="band-tag ${bandClass(d.band)}">${d.band}</span>
+      </div>
+      <div class="score-bar"><div class="score-bar-fill" data-width="${d.mean/5*100}" style="width:0"></div></div>
+      <div class="note">${d.note}</div>
+    </div>
+  `).join('') + '</div>';
+}
+
+function renderRecs() {
+  const c = document.getElementById('recsContainer');
+  if (!c) return;
+  c.innerHTML = '<div class="rec-grid">' + recommendations.map(r => {
+    const pc = r.priority === 'High' ? 'tag-high' : r.priority === 'Immediate' ? 'tag-immediate' : 'tag-medium';
+    return `<div class="rec-card">
+      <div class="rec-num">${String(r.num).padStart(2,'0')}</div>
+      <div>
+        <div class="rec-title">${r.title}</div>
+        <div class="rec-desc">${r.desc}</div>
+        <div class="rec-tags">
+          <span class="rec-tag ${pc}">${r.priority}</span>
+          <span class="rec-tag tag-horizon">${r.horizon}</span>
+          <span class="rec-tag tag-target">${r.target}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+function renderThemes() {
+  const c = document.getElementById('themesContainer');
+  if (!c) return;
+  c.innerHTML = '<div class="themes-grid">' + themes.map(t => `
+    <div class="theme-card" onclick="this.classList.toggle('open')">
+      <div class="theme-header"><h3>${t.title}</h3><div class="theme-toggle">▼</div></div>
+      <div class="theme-body"><p>${t.body}</p></div>
+    </div>
+  `).join('') + '</div>';
+}
+
+function renderRefs() {
+  const c = document.getElementById('refList');
+  if (!c) return;
+  c.innerHTML = refs.map(r => `<li>${r}</li>`).join('');
+}
+
+function renderTable() {
+  const c = document.getElementById('respTableContainer');
+  if (!c) return;
+  const hdr = '<tr><th>R#</th>' + dimensions.map(d => `<th>${d.name.split(' ').slice(0,2).join(' ')}</th>`).join('') + '<th>Mean</th></tr>';
+  const rows = respData.map(([id, scores]) => {
+    const m = (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(2);
+    return '<tr><td style="font-weight:700;color:var(--orange)">' + id + '</td>' + scores.map(s => `<td>${s}</td>`).join('') + `<td style="font-weight:700">${m}</td></tr>`;
+  }).join('');
+  c.innerHTML = `<div class="resp-table-wrap"><table class="resp-table"><thead>${hdr}</thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderCultureMap() {
+  const c = document.getElementById('cultureMapContainer');
+  if (!c) return;
+  const mapData = {
+    outcomes:[{text:"Customer co-innovation at point of contact",icon:"🎯"},{text:"Faster sensing of emerging customer needs",icon:"📡"},{text:"Innovation embedded in field operations",icon:"⚡"}],
+    behaviours:[{text:"Experimentation with new customer engagement models"},{text:"Cross-functional collaboration (ITP + account teams)"},{text:"Working Backwards applied to customer problems"},{text:"Innovation time protected in quarterly planning"}],
+    enablers:[{text:"Leadership Principles ('Invent and Simplify')",type:"formal",strength:"strong"},{text:"Working Backwards methodology",type:"formal",strength:"strong"},{text:"ITP team existence",type:"formal",strength:"moderate"},{text:"Day 1 cultural identity",type:"informal",strength:"strong"},{text:"Peer recognition of innovators",type:"informal",strength:"moderate"}],
+    blockers:[{text:"Quota-driven incentive architecture",type:"formal",strength:"critical"},{text:"No innovation weighting in objectives",type:"formal",strength:"critical"},{text:"Resource cannibalisation (no backfill)",type:"formal",strength:"strong"},{text:"Post-RIF fear / psychological safety erosion",type:"informal",strength:"critical"},{text:"Geographic distance from decision-makers",type:"informal",strength:"strong"},{text:"'Innovation is everyone's job' = no one's job",type:"informal",strength:"critical"}]
+  };
+  const rot = () => (Math.random()*4-2).toFixed(1);
+  c.innerHTML = `<div class="culture-map">
+    <div><div class="cm-col-header" style="background:linear-gradient(135deg,#1565C0,#1976D2)">Desired Outcomes</div>
+      <div class="cm-notes-grid">${mapData.outcomes.map(o=>`<div class="cm-note cm-note-outcome" style="transform:rotate(${rot()}deg)"><div class="cm-tape"></div><span class="cm-note-icon">${o.icon}</span>${o.text}</div>`).join('')}</div></div>
+    <div class="cm-arrow">⬇</div>
+    <div><div class="cm-col-header" style="background:linear-gradient(135deg,#E65100,#FF9900)">Required Behaviours</div>
+      <div class="cm-notes-grid">${mapData.behaviours.map(b=>`<div class="cm-note cm-note-behaviour" style="transform:rotate(${rot()}deg)"><div class="cm-tape"></div>${b.text}</div>`).join('')}</div></div>
+    <div class="cm-arrow">⬆ ⬆</div>
+    <div class="cm-eb-grid">
+      <div><div class="cm-col-header" style="background:linear-gradient(135deg,#2E7D32,#43A047)">Enablers</div>
+        <div class="cm-notes-grid">${mapData.enablers.map(e=>`<div class="cm-note cm-note-enabler" style="transform:rotate(${rot()}deg)" data-type="${e.type}" data-strength="${e.strength}"><div class="cm-tape"></div>${e.text}<div class="cm-note-tags"><span class="cm-tag">${e.type}</span><span class="cm-strength cm-str-${e.strength}">${e.strength}</span></div></div>`).join('')}</div></div>
+      <div class="cm-vs"><div class="cm-vs-label">Tension</div><div class="cm-vs-icon">⚡</div></div>
+      <div><div class="cm-col-header" style="background:linear-gradient(135deg,#C62828,#E53935)">Blockers</div>
+        <div class="cm-notes-grid">${mapData.blockers.map(b=>`<div class="cm-note cm-note-blocker" style="transform:rotate(${rot()}deg)" data-type="${b.type}" data-strength="${b.strength}"><div class="cm-tape"></div>${b.text}<div class="cm-note-tags"><span class="cm-tag">${b.type}</span><span class="cm-strength cm-str-${b.strength}">${b.strength}</span></div></div>`).join('')}</div></div>
+    </div>
+    <div class="cm-filter">
+      <span style="font-size:12px;color:var(--text-muted);margin-right:8px">Filter:</span>
+      <button class="cm-filter-btn active" onclick="filterMap('all')">All</button>
+      <button class="cm-filter-btn" onclick="filterMap('formal')">Formal</button>
+      <button class="cm-filter-btn" onclick="filterMap('informal')">Informal</button>
+      <button class="cm-filter-btn" onclick="filterMap('critical')">Critical Only</button>
+    </div>
+  </div>`;
+}
+
+function filterMap(type) {
+  document.querySelectorAll('.cm-filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.querySelectorAll('.cm-note-enabler,.cm-note-blocker').forEach(el => {
+    const r = (Math.random()*4-2).toFixed(1);
+    if (type==='all'){el.style.opacity='1';el.style.transform=`rotate(${r}deg)`}
+    else if(type==='critical'){const m=el.dataset.strength==='critical';el.style.opacity=m?'1':'0.15';el.style.transform=m?`rotate(${r}deg) scale(1.03)`:`rotate(${r}deg) scale(0.9)`}
+    else{const m=el.dataset.type===type;el.style.opacity=m?'1':'0.15';el.style.transform=m?`rotate(${r}deg) scale(1.03)`:`rotate(${r}deg) scale(0.9)`}
+  });
+}
+
+// ═══════════ CHARTS ═══════════
+function initCharts() {
+  Chart.defaults.color = '#8B949E';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.04)';
+  Chart.defaults.font.family = "'Plus Jakarta Sans',sans-serif";
+
+  // Radar
+  new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels: dimensions.map(d => d.name),
+      datasets: [{
+        label: 'AGS UKI',
+        data: dimensions.map(d => d.mean),
+        borderColor: '#FF9900',
+        backgroundColor: 'rgba(255,153,0,0.1)',
+        borderWidth: 2,
+        pointBackgroundColor: '#FF9900',
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      scales: { r: { beginAtZero: true, max: 5, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' }, pointLabels: { font: { size: 11, weight: '600' } } } },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // Bar
+  const sorted = [...dimensions].sort((a,b) => b.mean - a.mean);
+  new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: sorted.map(d => d.name),
+      datasets: [{
+        data: sorted.map(d => d.mean),
+        backgroundColor: sorted.map(d => d.band === 'Developing' ? '#F85149' : d.band === 'Established' ? '#3FB950' : '#FF9900'),
+        borderRadius: 6,
+        barThickness: 22,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      scales: { x: { beginAtZero: true, max: 5, grid: { color: 'rgba(255,255,255,0.03)' } }, y: { grid: { display: false }, ticks: { font: { size: 12, weight: '600' } } } },
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+// ═══════════ SCROLL ANIMATIONS ═══════════
+function initScrollAnimations() {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        entry.target.querySelectorAll('.score-bar-fill').forEach(bar => { bar.style.width = bar.dataset.width + '%'; });
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+}
+
+// ═══════════ NAVBAR SCROLL ═══════════
+function initNavbar() {
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+  // Active link highlighting
+  const sections = document.querySelectorAll('[id]');
+  const links = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (s.getBoundingClientRect().top < 200) current = s.id; });
+    links.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+}
+
+// ═══════════ INIT ═══════════
+document.addEventListener('DOMContentLoaded', () => {
+  renderScoreCards();
+  renderThemes();
+  renderRecs();
+  renderRefs();
+  renderTable();
+  renderCultureMap();
+  initCharts();
+  initScrollAnimations();
+  initNavbar();
+});
+</script>
+</body>
+</html>
