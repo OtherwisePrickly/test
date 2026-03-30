@@ -141,8 +141,28 @@ a{color:var(--orange);text-decoration:none}
 
 /* ═══════════ REFERENCES ═══════════ */
 .ref-list{list-style:none;margin-top:24px}
-.ref-list li{font-size:13px;color:var(--text-muted);padding:10px 0;border-bottom:1px solid var(--dark-border);line-height:1.6}
+.ref-list li{font-size:13px;color:var(--text-muted);padding:12px 0;border-bottom:1px solid var(--dark-border);line-height:1.6;position:relative;cursor:pointer;transition:all .3s}
 .ref-list li:last-child{border-bottom:none}
+.ref-list li:hover{color:var(--text);padding-left:8px}
+.ref-list li::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--orange);opacity:0;transition:opacity .3s;border-radius:2px}
+.ref-list li:hover::before{opacity:1}
+.ref-context{display:none;margin-top:10px;padding:14px 18px;background:linear-gradient(135deg,rgba(255,153,0,0.06),rgba(255,153,0,0.02));border:1px solid rgba(255,153,0,0.15);border-radius:var(--radius-sm);font-size:12.5px;color:var(--text);line-height:1.75;letter-spacing:0.1px}
+.ref-context .ctx-label{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--orange);margin-bottom:6px}
+.ref-context .ctx-section{display:inline-block;font-size:10px;font-weight:600;color:var(--text-muted);background:rgba(255,255,255,0.05);padding:2px 8px;border-radius:10px;margin-left:8px;margin-bottom:6px}
+.ref-list li.open .ref-context{display:block;animation:ctxFadeIn .3s ease}
+.ref-list li.open{background:rgba(255,153,0,0.02);margin:0 -16px;padding:12px 16px;border-radius:var(--radius-sm)}
+@keyframes ctxFadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══════════ INLINE CITATION TOOLTIPS ═══════════ */
+.cite-tip{position:relative;cursor:help;border-bottom:1px dotted rgba(255,153,0,0.4);transition:all .2s;color:var(--text)}
+.cite-tip:hover{color:var(--orange);border-bottom-color:var(--orange)}
+.cite-tip .cite-popup{display:none;position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);width:320px;padding:14px 16px;background:var(--navy);border:1px solid rgba(255,153,0,0.25);border-radius:var(--radius-sm);box-shadow:0 12px 40px rgba(0,0,0,0.5),0 0 0 1px rgba(255,153,0,0.1);z-index:999;pointer-events:none}
+.cite-tip:hover .cite-popup{display:block;animation:tipIn .25s ease}
+.cite-popup::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--navy)}
+.cite-popup .cite-author{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--orange);margin-bottom:4px}
+.cite-popup .cite-text{font-size:12.5px;color:var(--text);line-height:1.65;font-weight:400}
+@keyframes tipIn{from{opacity:0;transform:translateX(-50%) translateY(4px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@media(max-width:768px){.cite-tip .cite-popup{width:260px;left:0;transform:none}.cite-popup::after{left:30px;transform:none}}
 
 /* ═══════════ PESTLE TABLE ═══════════ */
 .pestle-wrap{overflow-x:auto;margin-top:24px}
@@ -376,6 +396,7 @@ a{color:var(--orange);text-decoration:none}
 <div class="divider"></div>
 <div class="section-sm" id="refs" style="max-width:1200px;margin:0 auto">
   <div class="section-header fade-in"><div class="section-num">&mdash;</div><div><div class="section-title">References</div></div></div>
+  <p class="body-text fade-in" style="font-size:12px;color:var(--text-dim);margin-bottom:8px">Click any reference to see how it is used in this report.</p>
   <ul class="ref-list fade-in" id="refList"></ul>
 </div>
 
@@ -649,10 +670,39 @@ function renderThemes() {
   `).join('') + '</div>';
 }
 
+const refContext = [
+  { sections: ['4.1'], text: 'Provides the VRIO framework underpinning the argument that AGS UKI possesses capabilities that are valuable and rare but not organised for field deployment. Connects the resource-based view to the ambidexterity diagnosis.' },
+  { sections: ['2', 'App A'], text: 'Methodological foundation for the qualitative analysis. The six-phase thematic analysis approach was used to code 100+ verbatim responses into five overarching themes.' },
+  { sections: ['1', '4.1'], text: 'Contextualises AWS\u2019s Working Backwards methodology as the most visible expression of corporate-level ambidexterity. Used to illustrate the gap between corporate innovation architecture and field-level reality.' },
+  { sections: ['4.2'], text: 'Frames the strategic ambiguity about whether a field sales function should innovate as a \u2018wicked problem\u2019: stakeholders disagree not just on the solution but on the problem definition itself. Connects to Week 3 module content on complex strategic challenges.' },
+  { sections: ['3.2'], text: 'Provides the BANI framework (Brittle, Anxious, Non-linear, Incomprehensible) to contextualise the post-RIF environment, explaining how quickly cultural capital can be destroyed by a single organisational shock.' },
+  { sections: ['3.2'], text: 'Foundational innovation theory. Describes exactly the conditions observed at AGS UKI: innovation is systematically deprioritised under operational pressure when it lacks formal structural protection.' },
+  { sections: ['4.1', '3.2'], text: 'Central to the \u2018whole versus the parts\u2019 tension argument: the corporate centre launches innovation programmes but the field absorbs the cost. Explains how resource misallocation concentrates between corporate intent and local execution.' },
+  { sections: ['4.3', '5'], text: 'Establishes psychological safety as a contingent state destroyed by threat-rigidity responses. Used to rebut the counter-argument that innovation culture is embedded, and to justify the \u2018immediate\u2019 priority of Recommendation 5. The 2024 RIF constitutes precisely the shock Edmondson describes.' },
+  { sections: ['4.2', '5'], text: 'The classic observation that organisations reward A while hoping for B. Applied directly to AGS UKI\u2019s quarterly incentive cycle, where innovation is espoused but execution is rewarded. Anchors the entire incentive architecture argument.' },
+  { sections: ['5'], text: 'Identifies preconditions for innovation implementation: climate, management support, and resource availability. Used to frame the recommendations and argue AGS UKI fails on at least two locally. Implementation climate identified as the strongest predictor of adoption.' },
+  { sections: ['5'], text: 'Structures the recommendation sequencing logic: urgency before embedding change. The proposed sequence (restore safety \u2192 realign incentives \u2192 activate capability) follows Kotter\u2019s emphasis on establishing urgency first.' },
+  { sections: ['4.1'], text: 'Foundational exploration/exploitation theory. Identifies why the field function remains locked in exploitation mode: the structure limits what incentives can reward, and leadership builds structures that reflect what it already measures.' },
+  { sections: ['3.2'], text: 'Five Ps for Strategy framework applied to the Day 1 Paradox: AWS has built strategy-as-perspective (a deeply held identity around innovation) but has not translated this into strategy-as-plan at the field level. Connects to Week 1 module content.' },
+  { sections: ['4.2'], text: 'Provides the 70/20/10 innovation portfolio benchmark (core/adjacent/transformational). Used to argue AGS UKI operates closer to 90/10/0 \u2014 a growth ceiling, not a growth strategy.' },
+  { sections: ['4.1'], text: 'Core theoretical framework. Organisational ambidexterity explains how firms balance exploitation and exploration. Applied to show AWS\u2019s corporate architecture is ambidextrous but this does not cascade to the field function.' },
+  { sections: ['1', '2', '3', '4.2'], text: 'Source of the Strategyzer Innovation Culture Readiness diagnostic and Culture Map framework. Both the assessment instrument and its limitations are critically evaluated: co-equal dimension treatment, readiness vs. output measurement, and the lack of psychometric validation.' },
+  { sections: ['1', '4.3'], text: 'The \u2018hard truth about innovative cultures\u2019: they require uncomfortable counterparts including rigorous discipline. Used both to support the thesis (cultures need formal architecture) and to complicate it (absent structures \u2260 absent capability). Dual deployment shows critical engagement.' },
+  { sections: ['2'], text: 'Challenge-led strategy approach: the methodology frames the diagnostic as a problem-diagnosis tool consistent with Rumelt\u2019s argument that identifying where the organisation believes its constraints lie is itself strategically useful.' },
+  { sections: ['4.1'], text: 'Identifies the pattern of strategy execution unravelling not through wholesale failure but through coordination breakdowns between corporate intent and field-level resource allocation. Applied directly to the ITP resourcing gap.' },
+  { sections: ['1', '3.2', '4.1', '4.2'], text: 'The most-cited author in the report. Dynamic capabilities framework argues that capabilities are organisational rather than corporate properties \u2014 the key distinction for the UKI-to-Global disconnect. Also underpins the urgency argument: inability to reconfigure assets where customer needs shift fastest.' },
+  { sections: ['1', '2', '3.2'], text: 'Core innovation management textbook. Provides the four-routine framework (search, selection, implementation, learning) threaded throughout the report. Used to evaluate Working Backwards as a search/selection routine that lacks implementation/learning support locally.' },
+];
+
 function renderRefs() {
   const c = document.getElementById('refList');
   if (!c) return;
-  c.innerHTML = refs.map(r => `<li>${r}</li>`).join('');
+  c.innerHTML = refs.map((r, i) => {
+    const ctx = refContext[i];
+    const secs = ctx ? ctx.sections.map(s => `<span class="ctx-section">\u00A7${s}</span>`).join('') : '';
+    const tip = ctx ? `<div class="ref-context"><span class="ctx-label">Role in this report</span>${secs}<br>${ctx.text}</div>` : '';
+    return `<li onclick="this.classList.toggle('open')">${r}${tip}</li>`;
+  }).join('');
 }
 
 function renderTable() {
@@ -829,6 +879,103 @@ function initNavbar() {
   });
 }
 
+// ═══════════ INLINE CITATION TOOLTIPS ═══════════
+const citeTooltips = {
+  'Barney': 'Resource-Based View: AGS UKI possesses capabilities that are valuable and rare but not organised for field deployment (VRIO framework).',
+  'Braun': 'Methodological foundation: six-phase thematic analysis approach used to code 100+ verbatim survey responses into five themes.',
+  'Clarke': 'Methodological foundation: six-phase thematic analysis approach used to code 100+ verbatim survey responses into five themes.',
+  'Bryar': 'Documents AWS\u2019s Working Backwards methodology \u2014 the most visible expression of corporate-level innovation architecture.',
+  'Carr': 'Documents AWS\u2019s Working Backwards methodology \u2014 the most visible expression of corporate-level innovation architecture.',
+  'Camillus': 'Wicked problems framework: stakeholders disagree not just on the solution but on the problem definition itself. Applied to the strategic ambiguity about field-level innovation.',
+  'Cascio': 'BANI framework (Brittle, Anxious, Non-linear, Incomprehensible): contextualises how the post-RIF environment destroyed cultural capital through a single organisational shock.',
+  'Christensen': 'Innovator\u2019s Dilemma: innovation is systematically deprioritised under operational pressure when it lacks formal structural protection.',
+  'Dodd': 'The \u2018whole versus the parts\u2019 tension: the corporate centre launches innovation programmes but the field absorbs the cost. Explains resource misallocation between corporate and local.',
+  'Favaro': 'The \u2018whole versus the parts\u2019 tension: the corporate centre launches innovation programmes but the field absorbs the cost. Explains resource misallocation between corporate and local.',
+  'Edmondson': 'Psychological safety is a contingent state destroyed by threat-rigidity responses. The 2024 RIF constitutes precisely such a shock. Justifies the \u2018immediate\u2019 priority of Recommendation 5.',
+  'Kerr': 'Organisations reward A while hoping for B. Applied to AGS UKI\u2019s quarterly incentive cycle: innovation is espoused but execution is rewarded. Anchors the incentive architecture argument.',
+  'Klein': 'Preconditions for innovation implementation: climate, management support, and resource availability. AGS UKI fails on at least two locally.',
+  'Knight': 'Preconditions for innovation implementation: climate, management support, and resource availability. AGS UKI fails on at least two locally.',
+  'Kotter': 'Change sequencing logic: urgency before embedding. The recommendations follow this \u2014 restore safety first, then realign incentives, then activate capability.',
+  'March': 'Exploration vs. exploitation: explains why the field function remains locked in exploitation mode. The foundational theory for the ambidexterity argument.',
+  'Mintzberg': 'Five Ps for Strategy: AWS has built strategy-as-perspective (innovation identity) but not strategy-as-plan at the field level. Frames the Day 1 Paradox.',
+  'Nagji': '70/20/10 innovation portfolio benchmark. AGS UKI operates closer to 90/10/0 \u2014 a growth ceiling, not a growth strategy.',
+  'Tuff': '70/20/10 innovation portfolio benchmark. AGS UKI operates closer to 90/10/0 \u2014 a growth ceiling, not a growth strategy.',
+  'O\u2019Reilly': 'Organisational ambidexterity: balancing exploitation and exploration. AWS\u2019s corporate architecture is ambidextrous but this does not cascade to the field function.',
+  'Tushman': 'Organisational ambidexterity: balancing exploitation and exploration. AWS\u2019s corporate architecture is ambidextrous but this does not cascade to the field function.',
+  'Osterwalder': 'Source of the Strategyzer diagnostic and Culture Map. Both the instrument and its limitations are critically evaluated: co-equal dimensions, readiness vs. output measurement.',
+  'Pisano': 'Innovative cultures require uncomfortable counterparts including rigorous discipline. Also: absent formal structures \u2260 absent capability \u2014 used to steelman the counter-argument.',
+  'Rumelt': 'Challenge-led strategy: identifying where the organisation believes its constraints lie is itself strategically useful. Frames the methodology\u2019s diagnostic rationale.',
+  'Sull': 'Strategy execution unravels through coordination breakdowns between corporate intent and field-level resource allocation \u2014 not wholesale failure.',
+  'Homkes': 'Strategy execution unravels through coordination breakdowns between corporate intent and field-level resource allocation \u2014 not wholesale failure.',
+  'Teece': 'Dynamic capabilities: the ability to reconfigure assets is organisational, not corporate. The key distinction for the UKI-to-Global disconnect and the urgency argument.',
+  'Tidd': 'Four innovation routines: search, selection, implementation, and learning. Working Backwards covers search/selection but implementation/learning are under-resourced locally.',
+  'Bessant': 'Four innovation routines: search, selection, implementation, and learning. Working Backwards covers search/selection but implementation/learning are under-resourced locally.',
+};
+
+function processCitations() {
+  const authors = Object.keys(citeTooltips).sort((a, b) => b.length - a.length);
+
+  function lookup(name) {
+    const norm = name.replace(/[\u2019\u0027]/g, "'");
+    for (const k of authors) {
+      if (norm.includes(k.replace(/[\u2019\u0027]/g, "'"))) return k;
+    }
+    return null;
+  }
+
+  function wrap(content, authorKey) {
+    const tip = citeTooltips[authorKey];
+    if (!tip) return content;
+    return '<span class="cite-tip">' + content +
+      '<span class="cite-popup"><div class="cite-author">' + authorKey.replace(/\u2019/g,"'") +
+      '</div><div class="cite-text">' + tip + '</div></span></span>';
+  }
+
+  // Narrative patterns: [regex, tooltipKey]
+  const narrativePatterns = [
+    [/\b(Teece(?:[\u2019']s)?)\s*(\(\d{4}\))/g, 'Teece'],
+    [/\b(Pisano)\s*(\(\d{4}\))/g, 'Pisano'],
+    [/\b(Edmondson(?:[\u2019']s)?)\s*(\(\d{4}\))/g, 'Edmondson'],
+    [/\b(Kerr(?:[\u2019']s)?)\s*(\(\d{4}\))/g, 'Kerr'],
+    [/\b(March)\s*(\(\d{4}\))/g, 'March'],
+    [/\b(Kotter(?:[\u2019']s)?)\s*(\(\d{4}\))/g, 'Kotter'],
+    [/\b(Christensen)\s*(\(\d{4}\))/g, 'Christensen'],
+    [/\b(Rumelt(?:[\u2019']s)?)\s*(\(\d{4}\))/g, 'Rumelt'],
+    [/\b(Cascio)\s*(\(\d{4}\))/g, 'Cascio'],
+    [/\b(Camillus)\s*(\(\d{4}\))/g, 'Camillus'],
+    [/\b(Mintzberg(?:[\u2019']s)?)\s*(\(\d{4}\))/g, 'Mintzberg'],
+    [/\b(Barney(?:[\u2019']s)?)\s*(\(\d{4}\))/g, 'Barney'],
+    [/\b(Osterwalder\s*(?:et\s+al\.)?)\s*(\(\d{4}\))/g, 'Osterwalder'],
+    [/\b(Braun\s+and\s+Clarke(?:[\u2019']s)?)\s*(\(\d{4}\))/g, 'Braun'],
+    [/\b(Tidd\s+and\s+Bessant(?:[\u2019']s)?)\s*(\(\d{4}\))/g, 'Tidd'],
+    [/\b(Nagji\s+and\s+Tuff)\s*(\(\d{4}\))/g, 'Nagji'],
+    [/\b(Klein\s+and\s+Knight)\s*(\(\d{4}\))/g, 'Klein'],
+    [/\b(Dodd\s+and\s+Favaro(?:[\u2019']s)?)\s*(\(\d{4}\))/g, 'Dodd'],
+    [/\b(Sull\s+et\s+al\.)\s*(\(\d{4}\))/g, 'Sull'],
+  ];
+
+  document.querySelectorAll('.body-text, .callout-text').forEach(el => {
+    let html = el.innerHTML;
+
+    // Pass 1: Parenthetical citations — (Author, Year)
+    html = html.replace(/\(([^)]{3,140}?\d{4}[a-z]?)\)/g, (full, inner) => {
+      const key = lookup(inner);
+      if (!key) return full;
+      return wrap('(' + inner + ')', key);
+    });
+
+    // Pass 2: Narrative citations — Author (Year)
+    narrativePatterns.forEach(([re, key]) => {
+      html = html.replace(re, (full, name, year) => {
+        if (full.includes('cite-tip')) return full;
+        return wrap(name + ' ' + year, key);
+      });
+    });
+
+    el.innerHTML = html;
+  });
+}
+
 // ═══════════ INIT ═══════════
 document.addEventListener('DOMContentLoaded', () => {
   renderScoreCards();
@@ -840,6 +987,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCharts();
   initScrollAnimations();
   initNavbar();
+  processCitations();
 });
 </script>
 </body>
